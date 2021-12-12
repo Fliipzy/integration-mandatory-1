@@ -3,7 +3,10 @@ using Program.LoggerLibrary;
 using System;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Program.ConsoleApp
 {
@@ -32,7 +35,7 @@ namespace Program.ConsoleApp
             }
         }
 
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             var serverSettings = _configuration.GetSection("server1Settings");
 
@@ -43,23 +46,42 @@ namespace Program.ConsoleApp
 
             _logger.Log("Sending data to SERVER_1...", SeverityLevel.INFO);
 
+            var csvText = File.ReadAllText("Data/WeatherData.csv");
+
             // Get server settings from configuration
             var serverAddress = serverSettings["address"];
             var serverPort = serverSettings.GetValue<int>("port");
             var serverEndpoint = serverSettings["endpoint"];
 
-            // Setup and send HTTP request to server
-            var request = HttpWebRequest.CreateHttp($"{serverAddress}:{serverPort}/{serverEndpoint}");
-            request.Method = "POST";
-            request.ContentType = "text/csv";
-            
+            using (var client = new HttpClient())
+            {
+                HttpResponseMessage response;
+                try
+                {
+                    response = await client.PostAsync("http://" + serverAddress + ":" + serverPort + "/" + serverEndpoint, 
+                        new StringContent(csvText, Encoding.UTF8));
+                }
+                catch (Exception)
+                {
+                    _logger.Log($"The program could not connect to the server", SeverityLevel.FATAL);
+                    return;
+                }
+                
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.Log($"The program received the unsuccessful status code ({response.StatusCode}) back!", SeverityLevel.FATAL);
+                    return;
+                }
 
+                 _logger.Log("\n\n" + await response.Content.ReadAsStringAsync(), SeverityLevel.INFO);
             
+            }
+
+            Console.ReadKey();
         }
 
         private static IConfiguration GetSettingsConfiguration()
         {
-            //Yikes, should probably find a more gracious way to do this...
             var appSettingsPath = Path.Combine(Directory.GetParent(
                 Directory.GetCurrentDirectory()).Parent.Parent.Parent.Parent.FullName,
                 "appsettings.json");

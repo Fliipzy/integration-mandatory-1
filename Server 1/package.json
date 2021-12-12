@@ -1,0 +1,19 @@
+{
+  "name": "server-1",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Frederik Lundbeck Jørgensen",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.1",
+    "csvtojson": "^2.0.10",
+    "express": "^4.17.1",
+    "json2csv": "^5.0.6",
+    "node-fetch": "^2.6.6",
+    "xml2js": "^0.4.23"
+  }
+}

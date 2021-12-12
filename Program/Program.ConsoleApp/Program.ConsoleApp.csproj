@@ -16,4 +16,10 @@
     <ProjectReference Include="..\Program.Logger\Program.LoggerLibrary.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Data\WeatherData.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
