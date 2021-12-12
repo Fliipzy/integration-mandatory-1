@@ -1,0 +1,2 @@
+bottle==0.12.19
+dicttoxml==1.7.4
